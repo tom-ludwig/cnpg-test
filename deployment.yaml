@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-backend
+  labels:
+    app: go-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: go-backend
+  template:
+    metadata:
+      labels:
+        app: go-backend
+    spec:
+      containers:
+        - name: go-backend
+          image: localhost/cnpg_test:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-example-app
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-example-app
+                  key: password
+            - name: PG_HOST
+              value: cluster-example-rw.default.svc
+            - name: PG_PORT
+              value: "5432"
+            - name: PG_DB
+              value: app
+            - name: PG_USER
+              value: streaming_replica
+            - name: PG_SSLMODE
+              value: verify-full
+            - name: PG_SSLROOTCERT
+              value: /certs/ca.crt
+            - name: PG_CLIENT_KEY
+              value: /m-tls/tls.key
+            - name: PG_CLIENT_CERT
+              value: /m-tls/tls.crt
+            - name: PORT
+              value: "8080"
+          volumeMounts:
+            - name: db-cert
+              mountPath: /certs
+              readOnly: true
+            - name: m-tls
+              mountPath: /m-tls
+              readOnly: true
+
+      volumes:
+        - name: db-cert
+          secret:
+            secretName: server-ca-key-pair
+            defaultMode: 0600
+            items:
+              - key: ca.crt
+                path: ca.crt
+        - name: m-tls
+          secret:
+            secretName: my-postgres-client-cert
+            defaultMode: 0600
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-backend
+spec:
+  type: LoadBalancer
+  selector:
+    app: go-backend
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
