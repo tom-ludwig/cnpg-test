@@ -8,39 +8,44 @@ The goal: experiment with CNPG and see how mTLS works in CNPG.
 ## Setup
 
 1. Start Minikube
+   ```bash
    minikube start
-
-2. Install cert-manager
+   ```
+3. Install cert-manager
+   ```bash
    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
-
-3. Install CNPG Operator
+   ```
+5. Install CNPG Operator
+   ```bash
    kubectl apply --server-side -f \
     https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.26/releases/cnpg-1.26.1.yaml
-
-4. Choose your cluster
-
-Simple (password auth):
-
-kubectl apply -f basic-cnpg-cluster.yaml
-
-Advanced (mTLS):
-
-kubectl apply -f mTLS-cnpg-cluster.yaml
-
+   ```
+7. Choose your cluster
+   - Simple (password auth):
+      ```bash
+         kubectl apply -f basic-cnpg-cluster.yaml
+      ```
+   - Advanced (mTLS):
+      ```
+      kubectl apply -f mTLS-cnpg-cluster.yaml
+      ```
 5. Build and load the Go app
+   ```bash
    podman build -t cnpg_test:latest .
    minikube image load cnpg_test
-
-6. Deploy the app
+   ```
+7. Deploy the app
+   ```bash
    kubectl apply -f go-deployment.yaml
+   ```
 
-7. Test it
-
-Run a tunnel:
-
-minikube tunnel
-
-Check the app:
-
-curl localhost:8080/healtz
-curl localhost:8080/time
+9. Test it
+   - Run a tunnel:
+      ```bash
+      minikube tunnel
+      ```
+   - Check the app:
+      ```bash
+      curl localhost:8080/healtz
+      curl localhost:8080/time
+      ```
