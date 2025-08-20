@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cnpg_test
+  name: cnpgtest
   labels:
-    app: cnpg_test
+    app: cnpgtest
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cnpg_test
+      app: cnpgtest
   template:
     metadata:
       labels:
-        app: cnpg_test
+        app: cnpgtest
     spec:
       containers:
-        - name: cnpg_test
+        - name: cnpgtest
           image: localhost/cnpg_test:latest
           imagePullPolicy: Never
           ports:
@@ -78,11 +78,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cnpg_test
+  name: cnpgtest
 spec:
   type: LoadBalancer
   selector:
-    app: cnpg_test
+    app: cnpgtest
   ports:
     - port: 8080
       targetPort: 8080
